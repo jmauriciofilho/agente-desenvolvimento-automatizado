@@ -1,6 +1,6 @@
 # Framework Agentico Pessoal
 
-Este projeto implementa uma estrutura de desenvolvimento agentico baseada nas diretrizes estabelecidas no documento "Criando Meu Agente Pessoal ". O foco principal é utilizar o paradigma de Spec Driven Development (SDD) para integrar de forma eficiente IAs (como Opencode, Claude Code e Codex) ao seu fluxo de trabalho diário.
+Este projeto implementa uma estrutura de desenvolvimento agentico baseada nas diretrizes estabelecidas no documento "Criando Meu Agente Pessoal ". O foco principal é utilizar o paradigma de Spec Driven Development (SDD) para integrar de forma eficiente IAs ao seu fluxo de trabalho diário utilizando o Opencode.
 
 ## 🎯 Objetivo do Script `setup_agent.sh`
 
@@ -30,8 +30,6 @@ Siga o passo a passo abaixo no seu terminal (Linux, macOS ou WSL) para inicializ
     ./setup_agent.sh
     ```
 
-4. Preencha o Cérebro: Abra o arquivo gerado em /.agent/project_instructions.md e preencha as marcações em branco ([ ]) com as informações específicas e reais da sua aplicação.
+4. Se for um projeto ja desenvolvido: Execute o comando /auto-context
 
-5. Configure a Plataforma IA (Crucial): Adicione o "System Prompt" (gerado durante a estruturação do framework) nas configurações globais da ferramenta que for usar (ex: aba de customização do Opencode, ou arquivo .cursorrules).
-
-6. Com isso feito, basta criar um novo spec.md na pasta de especificações e instruir a sua IA a seguir o plano!
+5. Se for iniciar um projeto: Insira o prompt com a especificação do projeto no Opencode e em seguida comece a solicitar features para o agente construir no projeto.
