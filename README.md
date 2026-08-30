@@ -21,13 +21,13 @@ Siga o passo a passo abaixo no seu terminal (Linux, macOS ou WSL) para inicializ
    No seu terminal, rode o comando:
 
     ```bash
-    chmod +x setup_agent.sh
+    chmod +x setup_agent_ada.sh
     ```
 
 3. Execute a Instalação:
 
     ```Bash
-    ./setup_agent.sh
+    ./setup_agent_ada.sh
     ```
 
 4. Se for um projeto ja desenvolvido: Execute o comando /auto-context
