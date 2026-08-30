@@ -1,11 +1,11 @@
 ---
 name: auto-context
-description: Executa uma tarefa de descoberta da arquitetura do projeto atual e preenche o templeta de instruções project_intructions.md
+description: Executa a descoberta e mapeamento da arquitetura do projeto atual e gera o arquivo .agent/project_instructions.md. Use ao iniciar em projetos existentes ou via comando /auto-context.
 ---
 
 Atue como um Engenheiro de Software Sênior. Analise todo o código-fonte, os arquivos de configuração (como package.json, requirements.txt, tsconfig, etc.) e a estrutura de diretórios deste projeto atual.
 
-Sua tarefa é fazer o "discovery" (descoberta) da arquitetura atual e preencher o template de instruções do agente. 
+Sua tarefa é fazer o "discovery" (descoberta) da arquitetura atual e preencher o template de instruções do agente.
 
 Busque ativamente identificar:
 1. O propósito principal e o domínio do projeto.
@@ -13,12 +13,12 @@ Busque ativamente identificar:
 3. O padrão arquitetural adotado e o mapa de pastas principal.
 4. As convenções de nomenclatura e de tratamento de erros utilizadas no código.
 
-Após concluir a análise, preencha o template abaixo de forma precisa com as informações reais que você encontrou. 
+Após concluir a análise, preencha o template abaixo de forma precisa com as informações reais que você encontrou.
 
 **INSTRUÇÃO DE SALVAMENTO (MUITO IMPORTANTE):**
-1. Verifique se existe uma pasta chamada `.agent` na raiz do projeto. Se não existir, crie-a.
-2. Salve o template preenchido OBRIGATORIAMENTE dentro desta pasta, com o nome exato de `project_instructions.md` (caminho: `/.agent/project_instructions.md`).
-3. Não use texto genérico, preencha os colchetes com os dados extraídos do nosso código.
+1. Verifique se existe a pasta `.agent` na raiz do projeto. Se não existir, crie-a.
+2. Salve o template preenchido OBRIGATORIAMENTE dentro desta pasta, com o nome exato de `project_instructions.md` (caminho: `.agent/project_instructions.md`).
+3. Não use texto genérico, preencha os colchetes com os dados reais extraídos do código.
 
 # 🤖 Instruções e Contexto do Projeto
 
@@ -33,7 +33,7 @@ Após concluir a análise, preencha o template abaixo de forma precisa com as in
 
 <tech_stack>
   - **Linguagem Principal:** [Preencha com a linguagem predominante e sua versão (ex: TypeScript, Python)]
-  - **Framework Core:** [Preencha com o framework core identificado (ex: React, Next.js, Django)]
+  - **Framework Core:** [Preencha com o framework core identificado (ex: React, Next.js, Django, FastAPI)]
   - **Ferramentas Auxiliares:** 
     - Estilização: [Identifique a biblioteca de CSS ou UI utilizada]
     - Banco de Dados / ORM: [Identifique o ORM ou banco mapeado]
@@ -41,27 +41,28 @@ Após concluir a análise, preencha o template abaixo de forma precisa com as in
 </tech_stack>
 
 <architecture>
-  - **Padrão Principal:** [Identifique o padrão de design adotado no código (ex: MVC, Clean Architecture, Feature-Sliced)]
+  - **Padrão Principal:** [Identifique o padrão de design adotado no código (ex: MVC, Clean Architecture, Feature-Sliced, Modular)]
   - **Mapa de Diretórios (Resumo):**
     [Mapeie os 4 a 5 diretórios principais do projeto e explique o propósito real de cada um com base no que você encontrou]
 </architecture>
 
 <coding_guidelines>
-  - **Nomenclatura:** [Descreva o padrão exato encontrado para arquivos, classes, variáveis (ex: PascalCase, camelCase)]
+  - **Nomenclatura:** [Descreva o padrão exato encontrado para arquivos, classes, variáveis (ex: PascalCase, camelCase, snake_case)]
   - **Tratamento de Erros:** [Descreva como o projeto atual lida com falhas/exceções]
   - **Geração de Código:** 
-    - Escreva código completo, não use placeholders como `// implemente o resto aqui`.
+    - Escreva código completo, nunca use placeholders como `// implemente o resto aqui`.
     - Siga os padrões de tipagem e comentários já existentes no repositório.
+    - Utilize links clicáveis no formato `[arquivo](file:///caminho/completo/arquivo#L1-L20)` ao citar trechos de código.
 </coding_guidelines>
 
 <agent_constraints>
   - **PROIBIDO:** Remover ou alterar configurações de ambiente (`.env`, `.gitignore`) a menos que explicitamente solicitado.
-  - **PROIBIDO:** Modificar código de bibliotecas externas.
+  - **PROIBIDO:** Modificar código de bibliotecas externas instaladas em `node_modules`, `venv`, etc.
   - **OBRIGATÓRIO:** Antes de sugerir novas dependências, verifique se não é possível usar a stack atual.
-  - **OBRIGATÓRIO:** Siga estritamente o documento `spec.md` (quando fornecido).
+  - **OBRIGATÓRIO:** Siga estritamente o documento de especificação (`spec.md`) ao implementar features.
 </agent_constraints>
 
 <available_skills>
-  - O agente possui habilidades modulares na pasta `/.agent/skills/`.
-  - Consulte o diretório de skills se precisar de contexto adicional sobre tarefas.
+  - O agente possui habilidades modulares na pasta `.agent/skills/`.
+  - Consulte o diretório de skills para procedimentos específicos de refatoração, scaffolding e testes.
 </available_skills>
