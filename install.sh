@@ -129,10 +129,23 @@ if [[ "$NO_LINKS" != "1" ]]; then
 fi
 
 # 4. Slash-commands (Claude Code e OpenCode)
+# No Claude Code, cada skill em .claude/skills/<nome> já vira o comando /<nome>;
+# instalar também .claude/commands/<nome>.md duplicaria a entrada no menu.
+claude_has_skill() {
+  [[ "$NO_LINKS" != "1" && -f "$SRC/agent/skills/$1/SKILL.md" ]]
+}
 if [[ "$NO_COMMANDS" != "1" && -d "$SRC/commands" ]]; then
   for f in "$SRC"/commands/*.md; do
     n="$(basename "$f")"
-    if has_tool claude;   then install_file "$f" "$CLAUDE_COMMANDS_DIR/$n"; fi
+    if has_tool claude; then
+      if claude_has_skill "${n%.md}"; then
+        dst="$CLAUDE_COMMANDS_DIR/$n"
+        # Remove a cópia duplicada deixada por versões anteriores (só se for idêntica ao template)
+        if [[ -f "$dst" ]] && cmp -s "$f" "$dst"; then rm "$dst"; echo "🧹 removido duplicado (já é skill): $dst"; fi
+      else
+        install_file "$f" "$CLAUDE_COMMANDS_DIR/$n"
+      fi
+    fi
     if has_tool opencode; then install_file "$f" "$OPENCODE_COMMANDS_DIR/$n"; fi
   done
 fi

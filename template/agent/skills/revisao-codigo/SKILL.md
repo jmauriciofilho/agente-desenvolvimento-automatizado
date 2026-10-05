@@ -1,5 +1,5 @@
 ---
-name: code-review
+name: revisao-codigo
 description: Autorrevisão rigorosa do diff contra a spec, corretude, segurança, complexidade e testes, antes de entregar. Use ao finalizar uma tarefa ou ao revisar um PR/diff.
 ---
 

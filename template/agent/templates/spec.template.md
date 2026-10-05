@@ -55,7 +55,7 @@
 - [ ] 2. Implementar a lógica central.
 - [ ] 3. Implementar testes conforme `<test_plan>`.
 - [ ] 4. Rodar `.agent/scripts/verify.sh` e corrigir.
-- [ ] 5. `code-review` do diff contra esta spec.
+- [ ] 5. `revisao-codigo` do diff contra esta spec.
 - [ ] 6. Registrar aprendizados (`memoria`) e mover spec para `done/`.
 </execution_plan>
 

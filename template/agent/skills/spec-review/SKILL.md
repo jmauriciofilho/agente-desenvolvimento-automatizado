@@ -13,7 +13,7 @@ Verifique cada item e liste os achados como `[BLOQUEANTE]`, `[ATENÇÃO]` ou `[S
 4. **Escopo:** `<files_in_scope>` existem (ou serão criados de forma coerente com a arquitetura); `<out_of_scope>` está explícito.
 5. **Consistência:** sem requisitos contraditórios; alinhada a `<architecture>` e `<agent_constraints>`.
 6. **Riscos:** segurança, migração de dados, compatibilidade reversa e performance foram considerados.
-7. **Plano:** passos pequenos, ordenados, cada um verificável; inclui verify, code-review e memória.
+7. **Plano:** passos pequenos, ordenados, cada um verificável; inclui verify, revisao-codigo e memória.
 8. Resultado: `APROVADA PARA REVISÃO DO USUÁRIO` (sem bloqueantes) ou `REPROVADA` + lista de correções.
 </execution_steps>
 

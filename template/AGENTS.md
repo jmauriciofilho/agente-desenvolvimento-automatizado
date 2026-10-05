@@ -32,7 +32,7 @@ Em dúvida, suba um nível. Se o escopo crescer durante a execução, **pare e r
 2. **ANALISAR** — Leia `<requirements>`, `<acceptance_criteria>`, `<files_in_scope>` e `<out_of_scope>`.
 3. **PLANEJAR** — Se `<execution_plan>` estiver vazio, gere passos técnicos pequenos e verificáveis.
 4. **EXECUTAR** — Código estritamente necessário. Marque cada passo com `[x]` na spec ao concluir.
-5. **VALIDAR** — Rode `.agent/scripts/verify.sh` (lê `<commands>`). Use `code-review` no diff. Confira cada `<acceptance_criteria>`.
+5. **VALIDAR** — Rode `.agent/scripts/verify.sh` (lê `<commands>`). Use `revisao-codigo` no diff. Confira cada `<acceptance_criteria>`.
 6. **FECHAR** — Skill `memoria` (registrar aprendizados); mova a spec para `.agent/specs/done/` e defina `Status: Completed`.
 
 ## 3. Regras de código e escopo
@@ -59,7 +59,7 @@ leia o `SKILL.md` correspondente sempre que o gatilho abaixo ocorrer e siga-o ri
 | `testes-automatizados` | Criar/ampliar testes |
 | `bugfix` | Relato de bug, erro, regressão, teste quebrando |
 | `refatoracao` | Limpeza/simplificação sem mudar comportamento |
-| `code-review` | Antes de entregar; revisão de diff/PR |
+| `revisao-codigo` | Antes de entregar; revisão de diff/PR |
 | `security-audit` | Auth, entrada de usuário, segredos, dependências, pedido explícito |
 | `dependency-eval` | Antes de adicionar/trocar uma dependência |
 | `git-workflow` | Branch, commits, descrição de PR |

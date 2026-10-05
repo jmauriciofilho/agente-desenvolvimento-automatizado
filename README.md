@@ -136,7 +136,7 @@ Em dúvida, sobe um nível. Se o escopo crescer no meio da execução, o agente 
 | **ANALISAR** | Lê `<requirements>`, `<acceptance_criteria>`, `<files_in_scope>`, `<out_of_scope>` |
 | **PLANEJAR** | Gera `<execution_plan>` se estiver vazio |
 | **EXECUTAR** | Código completo, só em `<files_in_scope>`; marca `[x]` a cada passo |
-| **VALIDAR** | `verify.sh` + `code-review` do diff + conferência dos ACs |
+| **VALIDAR** | `verify.sh` + `revisao-codigo` do diff + conferência dos ACs |
 | **FECHAR** | Skill `memoria`; spec vira `Completed` e vai para `done/` |
 
 ### Spec v2
@@ -156,7 +156,7 @@ Além dos blocos da v1, a spec agora tem `<files_in_scope>`, `<out_of_scope>`, `
 | `testes-automatizados` | Testes AAA vinculados aos ACs | Criar/ampliar testes |
 | `bugfix` | Reproduzir → teste que falha → causa raiz → correção mínima | Bug, regressão, teste quebrando |
 | `refatoracao` | Limpeza em passos pequenos, com testes de caracterização | Simplificação sem mudar comportamento |
-| `code-review` | Autorrevisão do diff (spec, corretude, segurança, testes) | Antes de entregar; revisão de PR |
+| `revisao-codigo` | Autorrevisão do diff (spec, corretude, segurança, testes) | Antes de entregar; revisão de PR |
 | `security-audit` | Segredos, entrada, authn/authz, dependências, OWASP | Auth, dados de usuário, APIs públicas |
 | `dependency-eval` | Justifica e compara antes de adicionar uma biblioteca | Antes de qualquer dependência nova |
 | `git-workflow` | Branch, Conventional Commits, descrição de PR | Versionamento (só commita se autorizado) |
@@ -176,7 +176,7 @@ Atalhos opcionais gerados para **Claude Code** e **OpenCode**. Nas demais ferram
 | `/auto-context` | Mapeia o projeto e gera `project_instructions.md` |
 | `/spec <tarefa>` | Triagem + `spec-writer` + `spec-review` |
 | `/bugfix <descrição>` | Método completo de correção de bug |
-| `/review [foco]` | `code-review` do diff atual |
+| `/review [foco]` | `revisao-codigo` do diff atual |
 | `/verify [etapas]` | Roda `verify.sh` e trata falhas |
 | `/context-sync` | Sincroniza o contexto com o código real |
 
