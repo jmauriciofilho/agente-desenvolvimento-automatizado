@@ -27,10 +27,10 @@ if [[ "${1:-}" == "--state" ]]; then code_state; exit 0; fi
 FILE=".agent/project_instructions.md"
 
 if [[ ! -f "$FILE" ]]; then
-  echo "❌ $FILE não encontrado. Rode a skill auto-context."; exit 2
+  echo "❌ $FILE não encontrado. Projeto existente: skill auto-context. Projeto novo: spec-writer (Modo Arquiteto)."; exit 2
 fi
 if grep -q 'ADA:UNCONFIGURED' "$FILE"; then
-  echo "❌ $FILE ainda não configurado (marcador ADA:UNCONFIGURED). Rode a skill auto-context."; exit 2
+  echo "❌ $FILE ainda não configurado (marcador ADA:UNCONFIGURED). Projeto existente: skill auto-context. Projeto novo: spec-writer (Modo Arquiteto)."; exit 2
 fi
 
 get_cmd() {

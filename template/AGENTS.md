@@ -11,10 +11,12 @@ Seja conciso e direto. Sem desculpas, sem verbosidade.
    - Se **não existir** ou contiver o marcador `ADA:UNCONFIGURED`, trate como inexistente:
      - Projeto com código existente → aplique a skill `auto-context`.
      - Projeto novo (do zero) → aplique a skill `spec-writer` (Modo Arquiteto) e, em seguida, `bootstrap` (marco 0). Nenhuma feature antes do bootstrap concluído.
+     - É projeto novo quando a pasta só tem arquivos do ADA (`AGENTS.md`, `CLAUDE.md`, `.agent/`, `.claude/`, `.agents/`, `.opencode/`, `.git/`) e, no máximo, `README`, `LICENSE` ou documentos. Em dúvida, pergunte.
    - Você está **proibido de escrever código** sem absorver `<tech_stack>`, `<architecture>`, `<commands>` e `<agent_constraints>`.
 2. Leia `.agent/memory/learnings.md` (erros e decisões já aprendidos). Não repita erros registrados.
 3. Rode `.agent/scripts/status.sh` (no Claude Code ele já roda ao abrir a sessão). Se houver spec `In Progress`, informe ao usuário em 1 linha (spec, passo, próximo) e pergunte se deve **retomá-la** antes de iniciar outra tarefa.
    - Para retomar: leia a spec inteira, o último registro de `<progress_log>` e o `git diff`; confira se o código bate com os passos `[x]` antes de continuar.
+   - Sem spec `In Progress` e com marco pendente em `.agent/specs/roadmap.md`, sugira o próximo marco quando o usuário não trouxer outra tarefa.
 
 ## 1. Triagem (proporcional ao tamanho da tarefa)
 
@@ -37,7 +39,7 @@ Em dúvida, suba um nível. Se o escopo crescer durante a execução, **pare e r
 4. **EXECUTAR** — Antes do primeiro passo, defina `Status: In Progress` na spec. Testes do `<test_plan>` primeiro (devem falhar), depois a lógica até passarem. Código estritamente necessário. Marque cada passo com `[x]` na spec ao concluir e registre em `<progress_log>`; se parar no meio, registre onde parou e o próximo passo.
    - Só **uma** spec `In Progress` por vez. Para trocar de tarefa, registre o ponto de parada e volte a atual para `Planned`.
 5. **VALIDAR** — Rode `.agent/scripts/verify.sh` sem argumentos (lê `<commands>` e confere o escopo). Use `revisao-codigo` no diff. Confira cada `<acceptance_criteria>`.
-6. **FECHAR** — Skill `memoria` (registrar aprendizados); mova a spec ou mini-spec para `.agent/specs/done/` e defina `Status: Completed`.
+6. **FECHAR** — Skill `memoria` (registrar aprendizados); mova a spec ou mini-spec para `.agent/specs/done/`, defina `Status: Completed` e, se for um marco do roadmap, marque-o `[x]` em `.agent/specs/roadmap.md`.
 
 ## 3. Regras de código e escopo
 
@@ -80,6 +82,7 @@ Se sua ferramenta suportar subagentes, delegue pesquisas amplas no repositório 
 Caso contrário, execute a pesquisa sequencialmente e resuma. Nunca dependa de um recurso exclusivo de uma ferramenta.
 
 No Claude Code, hooks em `.claude/settings.json` aplicam estas regras: edições fora do escopo da spec `In Progress` são bloqueadas, e o turno não termina com código alterado sem um `verify.sh` completo verde. Se um hook bloquear, siga a mensagem dele; nunca tente contorná-lo.
+Nas ferramentas sem esses hooks (Antigravity, Codex, OpenCode), faça você mesmo o que eles fariam: rode `.agent/scripts/check-scope.sh` depois de editar arquivos e `.agent/scripts/verify.sh` sem argumentos antes de encerrar qualquer resposta que tenha alterado código.
 <!-- ADA:END -->
 
 ## Regras do projeto

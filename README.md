@@ -103,11 +103,12 @@ git add AGENTS.md CLAUDE.md .agent .claude .agents .opencode
 │   ├── specs/
 │   │   ├── active/                  # Specs em andamento
 │   │   ├── done/                    # Specs concluídas
+│   │   ├── roadmap.md               # Projeto novo: marcos do MVP (criado no Modo Arquiteto)
 │   │   └── template_spec.md         # Cópia do template (compatibilidade com a v1)
 │   ├── scripts/
 │   │   ├── verify.sh                # escopo + lint + typecheck + test + build, via <commands>
 │   │   ├── check-scope.sh           # diff dentro de <files_in_scope> da spec In Progress?
-│   │   ├── status.sh                # specs ativas, progresso e próximo passo
+│   │   ├── status.sh                # specs ativas, progresso, próximo passo e próximo marco
 │   │   └── hooks/                   # hooks do Claude Code (guard-edit, require-verify)
 │   └── skills/<17 skills>/SKILL.md
 ├── .claude/{skills → link, commands/, settings.json}   # settings.json: hooks + permissões
@@ -129,12 +130,14 @@ Toda conversa começa com a **inicialização**, depois a **triagem** define o p
 
 | Etapa | Skill | Resultado |
 |---|---|---|
-| Discovery e stack | `spec-writer` (Modo B) | 2 propostas, sua escolha, ADR de stack com as dependências iniciais (pré-aprovadas) |
-| Contexto planejado | `spec-writer` (Modo B) | `project_instructions.md` com `<commands>` em `N/A` e estrutura "(planejado)"; MVP quebrado em specs |
+| Discovery e stack | `spec-writer` (Modo B) | Até 7 perguntas com sugestão; 2 propostas numa tabela fixa de critérios; sua escolha; ADR de stack com as dependências iniciais (pré-aprovadas) |
+| Contexto planejado | `spec-writer` (Modo B) | `project_instructions.md` revisado e aprovado, com `<commands>` em `N/A` e estrutura "(planejado)"; `.agent/specs/roadmap.md` com os marcos do MVP |
 | Marco 0 | `bootstrap` | Spec `00-bootstrap` aprovada; `git init` e commit dos arquivos do ADA (com sua autorização); esqueleto do gerador; `.gitignore`; lint, typecheck, testes e teste de fumaça; `<commands>` reais; `verify.sh` saindo com `0` |
-| Primeira feature | ciclo SDD | Só começa com o marco 0 `Completed` |
+| Primeira feature | ciclo SDD | Só começa com o marco 0 `Completed`; a spec de cada marco é escrita quando chega a vez dele, e o `status.sh` mostra o próximo |
 
 Sem git, `check-scope.sh` e os hooks não fazem nada; por isso o instalador avisa quando a pasta não é repositório, e o bootstrap começa pelo `git init`.
+
+O agente considera o projeto novo quando a pasta só tem arquivos do ADA (e, no máximo, `README`, `LICENSE` ou documentos). Em dúvida, ele pergunta.
 
 ### 1. Triagem (proporcional ao tamanho)
 
@@ -246,6 +249,8 @@ Compara o diff (`git diff HEAD` + arquivos novos) com os caminhos de `<files_in_
 | `PreToolUse` → `guard-edit.sh` | Antes de `Edit`/`Write` | Bloqueia arquivo fora do escopo da spec em andamento e diz ao agente como pedir autorização |
 | `SessionStart` → `status.sh --brief` | Ao abrir/retomar a sessão | Coloca no contexto as specs ativas e o próximo passo, para o agente oferecer a retomada |
 | `Stop` → `require-verify.sh` | Ao encerrar o turno | Bloqueia se houver mudança fora do escopo ou código alterado sem `verify.sh` completo verde (uma vez por turno, sem loop) |
+
+> ⚠️ **Só o Claude Code tem esses hooks.** Em Antigravity, Codex e OpenCode, o `AGENTS.md` manda o próprio agente rodar `check-scope.sh` após editar e `verify.sh` antes de encerrar, mas nada o obriga. Confira você mesmo com `.agent/scripts/verify.sh` antes de commitar.
 
 Também traz permissões: `verify.sh` e `check-scope.sh` liberados, edição de `.env*`/`.gitignore` pede confirmação, edição em `node_modules`/`vendor`/`venv` é negada. Se o projeto já tinha `.claude/settings.json`, o instalador mantém o seu e avisa para mesclar.
 
@@ -372,7 +377,7 @@ git commit -m "chore: migra framework ADA para v2"
 
 | Sintoma | Causa provável | Solução |
 |---|---|---|
-| `verify.sh` sai com `2` | Marcador `ADA:UNCONFIGURED` presente | Rode `/auto-context` |
+| `verify.sh` sai com `2` | Marcador `ADA:UNCONFIGURED` presente | Projeto existente: `/auto-context`. Projeto novo: descreva a ideia (Modo Arquiteto) |
 | `verify.sh` sai com `3` | `<commands>` vazio, `N/A` ou placeholders | Preencha os comandos reais |
 | Ferramenta não enxerga as skills | Caminho de skills diferente na sua versão | Ajuste as variáveis no topo do script e rode com `--force` só nos links, ou crie o link manualmente: `ln -s ../.agent/skills <pasta>/skills` |
 | `⚠️ ... já existe e não é um link do ADA` | Você já tinha uma pasta de skills própria na ferramenta | Mescle manualmente; o script não a toca |

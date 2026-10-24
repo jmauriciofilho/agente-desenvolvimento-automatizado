@@ -11,7 +11,7 @@
 # =============================================================================
 set -euo pipefail
 
-ADA_VERSION="2.3.0"
+ADA_VERSION="2.4.0"
 SELF="${BASH_SOURCE[0]}"
 SELF_DIR="$(cd "$(dirname "$SELF")" && pwd)"
 
@@ -83,6 +83,8 @@ resolve_src() {
 sha() { if command -v sha256sum >/dev/null 2>&1; then sha256sum | cut -d' ' -f1; else shasum -a 256 | cut -d' ' -f1; fi; }
 is_user_file() { [[ " $USER_FILES " == *" $1 "* ]]; }
 run() { if [[ "$DRY" == "1" ]]; then return 0; fi; "$@"; }
+# Copia do template garantindo leitura para todos (o template pode vir com 600, ex.: payload gerado em outra máquina)
+put() { run cp "$1" "$2"; run chmod u+rw,go+r "$2"; }
 
 # Arquivo instalado ainda é original? (hash igual ao do manifesto ou a alguma versão publicada do template)
 is_pristine() {
@@ -111,12 +113,12 @@ install_file() {
   local src="$1" dst="$2" rel="${1#"$SRC"/}"
   MANIFEST_NEW+="$(sha < "$src") $dst"$'\n'
   if [[ ! -e "$dst" ]]; then
-    run mkdir -p "$(dirname "$dst")"; run cp -p "$src" "$dst"
+    run mkdir -p "$(dirname "$dst")"; put "$src" "$dst"
     echo "✅ criado: $dst"; CREATED=$((CREATED + 1)); return 0
   fi
   if is_user_file "$dst" || cmp -s "$src" "$dst"; then SKIPPED=$((SKIPPED + 1)); return 0; fi
   if [[ "$FORCE" == "1" ]]; then
-    run cp "$dst" "$dst.bak.$STAMP"; run cp -p "$src" "$dst"
+    run cp -p "$dst" "$dst.bak.$STAMP"; put "$src" "$dst"
     echo "♻️  sobrescrito (backup: $dst.bak.$STAMP): $dst"; UPDATED=$((UPDATED + 1)); return 0
   fi
   if [[ "$UPGRADE" != "1" ]]; then echo "⏭️  mantido: $dst"; SKIPPED=$((SKIPPED + 1)); return 0; fi
@@ -124,9 +126,9 @@ install_file() {
     merge_managed_block "$src" "$dst"; return 0
   fi
   if is_pristine "$dst" "$rel"; then
-    run cp -p "$src" "$dst"; echo "⬆️  atualizado: $dst"; UPDATED=$((UPDATED + 1))
+    put "$src" "$dst"; echo "⬆️  atualizado: $dst"; UPDATED=$((UPDATED + 1))
   else
-    run cp -p "$src" "$dst.ada-new"
+    put "$src" "$dst.ada-new"
     echo "⚠️  customizado, mantido: $dst  →  nova versão em $dst.ada-new (compare e mescle)"
     CONFLICTS=$((CONFLICTS + 1))
   fi

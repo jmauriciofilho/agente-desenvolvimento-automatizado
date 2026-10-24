@@ -1,17 +1,32 @@
 #!/usr/bin/env bash
-# Mostra as specs/mini-specs em .agent/specs/active/: status, progresso do plano, próximo passo e último registro.
+# Mostra as specs/mini-specs em .agent/specs/active/ (status, progresso do plano, próximo passo, último registro)
+# e o próximo marco de .agent/specs/roadmap.md, se existir.
 # Uso: .agent/scripts/status.sh            # relatório completo
-#      .agent/scripts/status.sh --brief    # só imprime se houver spec ativa (usado no início da sessão)
+#      .agent/scripts/status.sh --brief    # só imprime se houver spec ativa ou marco pendente (usado no início da sessão)
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 BRIEF=0; [[ "${1:-}" == "--brief" ]] && BRIEF=1
 
+# Roadmap do MVP (projeto novo): progresso e próximo marco
+ROADMAP=".agent/specs/roadmap.md"
+roadmap() {
+  [[ -f "$ROADMAP" ]] || return 0
+  local total done_ next
+  total="$(grep -cE '^[[:space:]]*- \[[ xX]\] [0-9]+\.' "$ROADMAP")"
+  [[ "$total" -gt 0 ]] || return 0
+  done_="$(grep -cE '^[[:space:]]*- \[[xX]\] [0-9]+\.' "$ROADMAP")"
+  next="$(grep -m1 -E '^[[:space:]]*- \[ \] [0-9]+\.' "$ROADMAP" | sed -E 's/^[[:space:]]*- \[ \] //')"
+  if [[ -n "$next" ]]; then echo "🗺️  Roadmap: $done_/$total marcos — próximo: $next"
+  elif [[ "$BRIEF" != "1" ]]; then echo "🗺️  Roadmap: $done_/$total marcos — MVP concluído"; fi
+}
+
 FILES=()
 for f in .agent/specs/active/*.md; do [[ -f "$f" ]] && FILES+=("$f"); done
 if [[ ${#FILES[@]} -eq 0 ]]; then
   [[ "$BRIEF" == "1" ]] || echo "Nenhuma spec ativa em .agent/specs/active/."
+  roadmap
   exit 0
 fi
 
@@ -28,6 +43,7 @@ for f in "${FILES[@]}"; do
   if [[ -n "$next" ]]; then echo "    próximo: $next"; fi
   if [[ -n "$last" ]]; then echo "    último registro: $last"; fi
 done
+roadmap
 if [[ "$IN_PROGRESS" -gt 1 ]]; then
   echo "⚠️  $IN_PROGRESS specs em In Progress: só uma pode estar em execução. Pergunte ao usuário qual continuar e volte as outras para Planned."
 elif [[ "$IN_PROGRESS" -eq 1 ]]; then

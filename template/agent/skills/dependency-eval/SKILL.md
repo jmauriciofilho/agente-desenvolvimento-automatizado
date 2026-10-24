@@ -6,7 +6,7 @@ description: Avalia se uma nova dependência é realmente necessária, comparand
 # 📦 Avaliação de Dependências
 
 <execution_steps>
-1. **Necessidade:** a stack atual, a biblioteca padrão ou dependências já instaladas resolvem? Se sim, use-as e encerre.
+1. **Necessidade:** a stack atual, a biblioteca padrão ou dependências já instaladas resolvem? Se sim, use-as e encerre. Dependências listadas no ADR de stack aprovado (Modo Arquiteto) já estão aprovadas: não repita esta avaliação para elas.
 2. **Alternativas:** compare 2–3 opções (incluindo "implementar internamente" se for pequeno) por: manutenção ativa (últimos releases/commits), popularidade, licença compatível, tamanho/impacto no bundle, dependências transitivas, tipagem/qualidade de docs, histórico de vulnerabilidades, compatibilidade com as versões do projeto.
 3. Use pesquisa na web/registry quando disponível para dados atuais; não confie em memória para versões e status de manutenção.
 4. Apresente uma tabela comparativa curta, recomendação e o custo de remover depois.

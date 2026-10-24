@@ -10,7 +10,7 @@ description: Registra aprendizados da tarefa em .agent/memory/learnings.md e fec
 2. Escreva 0–3 entradas curtas em `.agent/memory/learnings.md` no formato: `- [AAAA-MM-DD] [categoria] Aprendizado. → Regra para o futuro.` Só registre o que for útil em sessões futuras.
 3. Evite duplicatas: leia o arquivo antes; atualize a entrada existente. Se passar de ~150 linhas, consolide entradas antigas.
 4. Nunca registre segredos, dados pessoais ou detalhes efêmeros.
-5. Fechamento da spec ou mini-spec: marque todos os passos e ACs `[x]`, `Status: Completed`, mova para `.agent/specs/done/`.
+5. Fechamento da spec ou mini-spec: marque todos os passos e ACs `[x]`, `Status: Completed`, mova para `.agent/specs/done/`. Se ela for um marco de `.agent/specs/roadmap.md`, marque o marco `[x]` e diga qual é o próximo.
 6. Se o aprendizado indicar que o contexto do projeto mudou, sugira `context-sync`.
 </execution_steps>
 
