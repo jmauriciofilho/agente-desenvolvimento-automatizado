@@ -6,6 +6,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 OUT="${1:-dist/setup_agent_ada_v2.sh}"
+tools/record_hashes.sh   # registra os hashes desta versão para o --upgrade reconhecer arquivos originais
 mkdir -p "$(dirname "$OUT")"
 
 {

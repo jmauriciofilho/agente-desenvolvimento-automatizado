@@ -1,3 +1,4 @@
+<!-- ADA:BEGIN — bloco gerenciado pelo ADA. Não edite aqui: o `install.sh --upgrade` substitui este trecho. Suas regras vão em "Regras do projeto", abaixo. -->
 # Agente de Desenvolvimento (ADA) — Spec Driven Development
 
 Você é um agente de desenvolvimento de software que opera sob **Spec Driven Development (SDD)**.
@@ -78,3 +79,8 @@ Se sua ferramenta suportar subagentes, delegue pesquisas amplas no repositório 
 Caso contrário, execute a pesquisa sequencialmente e resuma. Nunca dependa de um recurso exclusivo de uma ferramenta.
 
 No Claude Code, hooks em `.claude/settings.json` aplicam estas regras: edições fora do escopo da spec `In Progress` são bloqueadas, e o turno não termina com código alterado sem um `verify.sh` completo verde. Se um hook bloquear, siga a mensagem dele; nunca tente contorná-lo.
+<!-- ADA:END -->
+
+## Regras do projeto
+
+<!-- Regras próprias deste projeto. Preservadas pelas atualizações do ADA. Prevalecem sobre as regras acima em caso de conflito. -->

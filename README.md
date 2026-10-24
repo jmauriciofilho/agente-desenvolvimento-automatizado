@@ -14,6 +14,7 @@ O instalador é pequeno porque o **conteúdo vive em arquivos reais** (`template
 agente-desenvolvimento-automatizado/
 ├── install.sh          # instalador (~140 linhas): copia template/ para o projeto
 ├── build_single.sh     # opcional: gera instalador de arquivo único em dist/
+├── tools/record_hashes.sh  # registra hashes do template em template/known_hashes.txt (usado pelo --upgrade)
 ├── README.md
 └── template/
     ├── AGENTS.md
@@ -28,7 +29,8 @@ agente-desenvolvimento-automatizado/
 | Instalar em um projeto | `/caminho/agente-desenvolvimento-automatizado/install.sh` (na raiz do projeto) |
 | Instalar direto de um repositório git | `bash install.sh --from=https://github.com/jmauriciofilho/agente-desenvolvimento-automatizado` |
 | Distribuir um único arquivo | `bash build_single.sh` → `dist/setup_agent_ada_v2.sh` (template compactado embutido) |
-| Editar/criar uma skill | Edite `template/agent/skills/<nome>/SKILL.md` e reinstale com `--force` nos projetos |
+| Editar/criar uma skill | Edite `template/agent/skills/<nome>/SKILL.md`, rode `bash build_single.sh` e use `--upgrade` nos projetos |
+| Atualizar um projeto que já usa o ADA | `/caminho/install.sh --upgrade` (veja antes com `--dry-run`) |
 
 ---
 
@@ -241,11 +243,25 @@ Também traz permissões: `verify.sh` e `check-scope.sh` liberados, edição de 
 | Opção | Efeito |
 |---|---|
 | *(nenhuma)* | Cria o que falta; **mantém** o que já existe |
-| `--force` | Sobrescreve existentes, gerando backup `arquivo.bak` |
+| `--upgrade` | Atualiza arquivos do framework que você **não** customizou; nos customizados, grava a nova versão em `arquivo.ada-new` |
+| `--force` | Sobrescreve arquivos do framework, com backup `arquivo.bak.<data>` |
+| `--dry-run` | Mostra o que seria feito, sem alterar nada |
 | `--tools=a,b` | Limita a `antigravity,claude,codex,opencode` (padrão: todas) |
 | `--no-links` | Não cria symlinks/cópias de skills |
 | `--no-commands` | Não cria slash-commands |
 | `-h`, `--help` | Ajuda |
+
+### Atualização segura (`--upgrade`)
+
+| Tipo de arquivo | Exemplos | O que o `--upgrade` faz |
+|---|---|---|
+| Do usuário | `project_instructions.md`, `memory/learnings.md`, specs, decisions | Nunca toca (nem com `--force`) |
+| Do framework, original | skills, templates, scripts, comandos, `.claude/settings.json` | Atualiza |
+| Do framework, customizado | uma skill que você editou | Mantém o seu e grava a nova versão em `.ada-new` para você mesclar |
+| `AGENTS.md` com marcadores | `<!-- ADA:BEGIN -->` … `<!-- ADA:END -->` | Substitui só o bloco; suas regras em **Regras do projeto** ficam |
+| Obsoleto | arquivo de versão antiga que saiu do ADA | Só avisa; nunca apaga |
+
+"Original" é decidido por hash: o instalador grava `.agent/.ada-manifest` com o hash de cada arquivo instalado e também conhece os hashes de todas as versões publicadas (`template/known_hashes.txt`). Por isso projetos instalados antes do manifesto (v2.0, v2.1) também são atualizados com segurança.
 
 ---
 
@@ -256,7 +272,7 @@ Também traz permissões: `verify.sh` e `check-scope.sh` liberados, edição de 
 | Tema | v1 | v2 |
 |---|---|---|
 | Regras | `AGENTS.md` longo, com o discovery embutido | `AGENTS.md` curto + índice; procedimentos viraram skills |
-| Re-execução do script | Sobrescreve tudo | Idempotente; `--force` faz backup |
+| Re-execução do script | Sobrescreve tudo | Idempotente; `--upgrade` atualiza preservando customizações |
 | Contexto | Exemplo com dados falsos (`/src/components`...) tratado como verdade | Só placeholders + marcador `ADA:UNCONFIGURED` |
 | Validação | "Se houver linters, execute" (sem saber quais) | Bloco `<commands>` + `verify.sh` |
 | Processo | Sempre spec completa | Triagem: trivial / pequena / feature / bug |
@@ -276,27 +292,19 @@ git checkout -b chore/ada-v2
 git status   # árvore limpa
 ```
 
-**2. Rode o instalador (modo seguro)**
+**2. Rode o instalador em modo de atualização**
 ```bash
-./install.sh
+./install.sh --upgrade --dry-run   # veja o que vai mudar
+./install.sh --upgrade
 ```
-Sem `--force`, seus arquivos existentes são **mantidos**. O script só adiciona o que falta (skills novas, templates, `verify.sh`, `memory/`, links, `CLAUDE.md`).
+O instalador reconhece os arquivos da v1 que você não editou (o `AGENTS.md` e as 4 skills antigas) e os atualiza. O `project_instructions.md` e a memória nunca são sobrescritos.
 
-**3. Atualize o `AGENTS.md`**
-O seu foi mantido e ainda é o da v1. Duas opções:
+**3. Mescle o que você customizou**
+Se você editou o `AGENTS.md` ou alguma skill, o seu arquivo foi mantido e a versão nova está em `<arquivo>.ada-new`. Para o `AGENTS.md`: use o `.ada-new` como base e copie suas regras próprias para a seção **Regras do projeto** (fora do bloco `ADA:BEGIN/END`); a partir daí as próximas atualizações preservam essas regras sozinhas.
 ```bash
-# A) Substituir pelo novo (seu antigo vira AGENTS.md.bak)
-./install.sh --force --tools=antigravity --no-links --no-commands
+find . -name '*.ada-new' -not -path './node_modules/*'   # lista o que mesclar
 ```
-Depois copie de `AGENTS.md.bak` para o novo `AGENTS.md` qualquer regra própria que você tenha adicionado.
-
-> ⚠️ `--force` sobrescreve **todos** os arquivos do script, inclusive `.agent/project_instructions.md` (que voltaria ao estado `UNCONFIGURED`; o seu fica em `.bak`). Se preferir não arriscar, use a opção B.
-
-```bash
-# B) Manual: copie o AGENTS.md de um repositório de teste onde você rodou o script
-mkdir /tmp/ada-ref && (cd /tmp/ada-ref && /caminho/install.sh --no-links --no-commands)
-cp /tmp/ada-ref/AGENTS.md ./AGENTS.md
-```
+Arquivos marcados como `🗑️ obsoleto` (ex.: `.agent/skills/refatoracao.md` da v1) podem ser removidos.
 
 **4. Atualize o `project_instructions.md` (sem perder o conteúdo)**
 O seu arquivo da v1 não tem o marcador, então é tratado como **configurado**, mas falta o que a v2 usa. Peça ao agente:
@@ -309,17 +317,7 @@ ou adicione manualmente estes blocos, copiando a estrutura de `.agent/templates/
 
 Se o seu arquivo ainda tiver os dados de exemplo da v1 (`/src/components`, `PascalCase.tsx`), apague-os e rode `/auto-context` para regenerar com dados reais.
 
-**5. Atualize as skills antigas**
-As 4 skills da v1 (`auto-context`, `refatoracao`, `scaffolding`, `testes-automatizados`) foram **mantidas** e não recebem as melhorias. Para atualizá-las sem tocar no resto:
-```bash
-for s in auto-context refatoracao scaffolding testes-automatizados; do
-  mv .agent/skills/$s/SKILL.md .agent/skills/$s/SKILL.md.v1
-done
-./install.sh          # recria apenas as que estão faltando
-```
-Se você customizou alguma, compare com o `.v1` e reaplique. Depois apague os `.v1`.
-
-**6. Reorganize as specs**
+**5. Reorganize as specs**
 ```bash
 mkdir -p .agent/specs/active .agent/specs/done
 # Specs em andamento ou rascunho:
@@ -331,14 +329,14 @@ Mantenha `.agent/specs/template_spec.md`; ele é só compatibilidade.
 
 Specs antigas continuam válidas, mas sem `files_in_scope` o agente não sabe o limite do escopo. Peça `spec-review` nas que ainda estão ativas.
 
-**7. Valide**
+**6. Valide**
 ```bash
 .agent/scripts/verify.sh
 ```
 - Saída `3` → `<commands>` ainda não configurado (passo 4).
 - Algum comando falhando → corrija o comando no `<commands>` ou o projeto.
 
-**8. Commit**
+**7. Commit**
 ```bash
 git add -A
 git commit -m "chore: migra framework ADA para v2"
@@ -347,11 +345,10 @@ git commit -m "chore: migra framework ADA para v2"
 ### Checklist de migração
 
 - [ ] Branch criada, árvore limpa
-- [ ] `install.sh` executado
-- [ ] `AGENTS.md` atualizado (regras próprias preservadas)
+- [ ] `install.sh --upgrade` executado
+- [ ] `.ada-new` mesclados e apagados; regras próprias em **Regras do projeto** do `AGENTS.md`
 - [ ] `project_instructions.md` com `<commands>`, `<git_conventions>`, `<security>`, `<definition_of_done>`
 - [ ] Dados de exemplo da v1 removidos
-- [ ] Skills antigas atualizadas
 - [ ] Specs movidas para `active/` e `done/`
 - [ ] `verify.sh` retorna `0`
 - [ ] Links de skills funcionando (`ls -la .claude .agents .opencode`)
