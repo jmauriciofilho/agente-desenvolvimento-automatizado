@@ -10,7 +10,7 @@ Seja conciso e direto. Sem desculpas, sem verbosidade.
 1. Leia `.agent/project_instructions.md`.
    - Se **não existir** ou contiver o marcador `ADA:UNCONFIGURED`, trate como inexistente:
      - Projeto com código existente → aplique a skill `auto-context`.
-     - Projeto novo (do zero) → aplique a skill `spec-writer` (Modo Arquiteto).
+     - Projeto novo (do zero) → aplique a skill `spec-writer` (Modo Arquiteto) e, em seguida, `bootstrap` (marco 0). Nenhuma feature antes do bootstrap concluído.
    - Você está **proibido de escrever código** sem absorver `<tech_stack>`, `<architecture>`, `<commands>` e `<agent_constraints>`.
 2. Leia `.agent/memory/learnings.md` (erros e decisões já aprendidos). Não repita erros registrados.
 3. Rode `.agent/scripts/status.sh` (no Claude Code ele já roda ao abrir a sessão). Se houver spec `In Progress`, informe ao usuário em 1 linha (spec, passo, próximo) e pergunte se deve **retomá-la** antes de iniciar outra tarefa.
@@ -45,7 +45,7 @@ Em dúvida, suba um nível. Se o escopo crescer durante a execução, **pare e r
 - Só altere arquivos listados em `<files_in_scope>`. Se precisar de outro, peça autorização, registre em `<change_log>` e adicione-o a `<files_in_scope>`. Confira com `.agent/scripts/check-scope.sh`.
 - Spec aprovada mudou (requisitos, ACs, escopo)? Pare, registre em `<change_log>` e peça nova aprovação antes de continuar.
 - Não adicione dependências sem passar pela skill `dependency-eval`.
-- Nunca commite segredos; nunca altere `.env`/`.gitignore` sem pedido explícito.
+- Nunca commite segredos; nunca altere `.env`/`.gitignore` sem pedido explícito (estar em `<files_in_scope>` de uma spec aprovada conta como pedido).
 - Siga as convenções de `<coding_guidelines>`; não introduza estilo novo.
 - Referências a código: use `caminho/relativo/arquivo.ext:L10-L20` (em Antigravity, links `file://` também são aceitos).
 
@@ -60,6 +60,7 @@ leia o `SKILL.md` correspondente sempre que o gatilho abaixo ocorrer e siga-o ri
 | `auto-context` | Sem `project_instructions.md` válido em projeto existente; `/auto-context` |
 | `spec-writer` | Feature/tarefa sem spec; projeto novo |
 | `spec-review` | Antes de pedir aprovação de uma spec |
+| `bootstrap` | Projeto novo, logo após o Modo Arquiteto (marco 0) |
 | `scaffolding` | Nova feature/módulo: criar estrutura e contratos |
 | `testes-automatizados` | Criar/ampliar testes |
 | `bugfix` | Relato de bug, erro, regressão, teste quebrando |

@@ -61,7 +61,8 @@ chmod +x install.sh
 /auto-context            # ou: "aplique a skill auto-context"
 
 # 2b. Projeto novo: descreva a ideia; o agente faz o discovery,
-#     propõe arquiteturas e quebra o MVP em specs.
+#     propõe arquiteturas, quebra o MVP em specs e executa o
+#     marco 0 (bootstrap: git, esqueleto, lint e testes) antes da 1ª feature.
 
 # 3. Confirme que os comandos do projeto funcionam
 .agent/scripts/verify.sh
@@ -108,7 +109,7 @@ git add AGENTS.md CLAUDE.md .agent .claude .agents .opencode
 │   │   ├── check-scope.sh           # diff dentro de <files_in_scope> da spec In Progress?
 │   │   ├── status.sh                # specs ativas, progresso e próximo passo
 │   │   └── hooks/                   # hooks do Claude Code (guard-edit, require-verify)
-│   └── skills/<16 skills>/SKILL.md
+│   └── skills/<17 skills>/SKILL.md
 ├── .claude/{skills → link, commands/, settings.json}   # settings.json: hooks + permissões
 ├── .agents/skills → link            # Codex
 └── .opencode/{skills → link, command/}
@@ -121,8 +122,19 @@ git add AGENTS.md CLAUDE.md .agent .claude .agents .opencode
 Toda conversa começa com a **inicialização**, depois a **triagem** define o peso do processo, e só então roda o ciclo SDD.
 
 ### 0. Inicialização
-1. Ler `.agent/project_instructions.md`. Se não existir ou ainda tiver o marcador `ADA:UNCONFIGURED`, o agente trata como inexistente e aciona `auto-context` (projeto existente) ou `spec-writer` em Modo Arquiteto (projeto novo).
+1. Ler `.agent/project_instructions.md`. Se não existir ou ainda tiver o marcador `ADA:UNCONFIGURED`, o agente trata como inexistente e aciona `auto-context` (projeto existente) ou `spec-writer` em Modo Arquiteto seguido de `bootstrap` (projeto novo; veja abaixo).
 2. Ler `.agent/memory/learnings.md` para não repetir erros já registrados.
+
+### Projeto novo: Modo Arquiteto e marco 0
+
+| Etapa | Skill | Resultado |
+|---|---|---|
+| Discovery e stack | `spec-writer` (Modo B) | 2 propostas, sua escolha, ADR de stack com as dependências iniciais (pré-aprovadas) |
+| Contexto planejado | `spec-writer` (Modo B) | `project_instructions.md` com `<commands>` em `N/A` e estrutura "(planejado)"; MVP quebrado em specs |
+| Marco 0 | `bootstrap` | Spec `00-bootstrap` aprovada; `git init` e commit dos arquivos do ADA (com sua autorização); esqueleto do gerador; `.gitignore`; lint, typecheck, testes e teste de fumaça; `<commands>` reais; `verify.sh` saindo com `0` |
+| Primeira feature | ciclo SDD | Só começa com o marco 0 `Completed` |
+
+Sem git, `check-scope.sh` e os hooks não fazem nada; por isso o instalador avisa quando a pasta não é repositório, e o bootstrap começa pelo `git init`.
 
 ### 1. Triagem (proporcional ao tamanho)
 
@@ -161,6 +173,7 @@ Além dos blocos da v1, a spec agora tem `<files_in_scope>`, `<out_of_scope>`, `
 | `auto-context` | Descobre a arquitetura e gera `project_instructions.md` (inclui `<commands>` reais) | Sem contexto válido; `/auto-context` |
 | `spec-writer` | Discovery → spec (Modo A: feature; Modo B: projeto novo) | Feature sem spec; projeto novo |
 | `spec-review` | Checa testabilidade, rastreabilidade, escopo e contradições | Antes de pedir aprovação |
+| `bootstrap` | Marco 0: git, esqueleto, ferramentas e `<commands>` reais | Projeto novo, após o Modo Arquiteto |
 | `scaffolding` | Esqueletos, contratos e wiring | Nova feature/módulo |
 | `testes-automatizados` | Testes AAA vinculados aos ACs | Criar/ampliar testes |
 | `bugfix` | Reproduzir → teste que falha → causa raiz → correção mínima | Bug, regressão, teste quebrando |
@@ -280,7 +293,7 @@ Também traz permissões: `verify.sh` e `check-scope.sh` liberados, edição de 
 | Template | Duplicado na skill e no arquivo | Fonte única em `.agent/templates/` |
 | Specs | Soltas em `.agent/specs/` | `specs/active/` e `specs/done/` |
 | Memória | Nenhuma | `.agent/memory/learnings.md` |
-| Skills | 4 | 16 |
+| Skills | 4 | 17 |
 | Ferramentas | Antigravity | + Claude Code, Codex, OpenCode |
 | Links de código | `file:///` | `caminho/relativo:Lx-Ly` (`file://` ainda aceito no Antigravity) |
 

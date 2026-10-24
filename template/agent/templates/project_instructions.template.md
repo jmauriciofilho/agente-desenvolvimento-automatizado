@@ -22,7 +22,7 @@
 </tech_stack>
 
 <commands>
-  <!-- Formato: "- nome: comando". Lido por .agent/scripts/verify.sh. Use N/A se não existir. -->
+  <!-- Formato: "- nome: comando". Lido por .agent/scripts/verify.sh. Use N/A se não existir. Projeto novo: N/A até a skill bootstrap. -->
   - install: [comando]
   - lint: [comando]
   - typecheck: [comando]
@@ -66,7 +66,7 @@
 </definition_of_done>
 
 <agent_constraints>
-  - **PROIBIDO:** alterar `.env`, `.gitignore` ou configs de ambiente sem pedido explícito.
+  - **PROIBIDO:** alterar `.env`, `.gitignore` ou configs de ambiente sem pedido explícito (estar em `<files_in_scope>` de uma spec aprovada conta como pedido).
   - **PROIBIDO:** modificar código de dependências instaladas (`node_modules`, `venv`, `vendor`, etc.).
   - **PROIBIDO:** commitar segredos ou executar comandos destrutivos (drop, `rm -rf`, force push) sem confirmação.
   - **OBRIGATÓRIO:** passar por `dependency-eval` antes de adicionar dependências.

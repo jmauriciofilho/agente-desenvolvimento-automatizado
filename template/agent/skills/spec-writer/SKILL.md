@@ -20,9 +20,10 @@ description: Conduz o discovery e redige a especificação (spec) de uma feature
 <execution_steps>
 1. Discovery: problema, usuários, escopo do MVP, restrições (prazo, custo, equipe, hospedagem), preferências de stack.
 2. Proponha 2 arquiteturas/stacks com prós, contras e recomendação justificada.
-3. Após escolha, gere `.agent/project_instructions.md` a partir de `.agent/templates/project_instructions.template.md` (remova o marcador `ADA:UNCONFIGURED`) — apenas após aprovação.
-4. Quebre o MVP em specs por marco (uma spec por entrega), listando a ordem sugerida.
-5. Registre as decisões de arquitetura com a skill `adr`.
+3. Após a escolha, registre o ADR de stack (skill `adr`): linguagem, framework, versões, gerador do esqueleto e dependências iniciais. Essas dependências ficam pré-aprovadas para o bootstrap. Registre também as demais decisões de arquitetura.
+4. Gere `.agent/project_instructions.md` a partir de `.agent/templates/project_instructions.template.md` (remova o marcador `ADA:UNCONFIGURED`) — apenas após aprovação. Como ainda não há código: `<commands>` ficam todos `N/A` (o bootstrap preenche) e `<architecture>` descreve a estrutura planejada, marcada como "(planejado)".
+5. Quebre o MVP em specs por marco (uma spec por entrega), listando a ordem sugerida. O **marco 0 é sempre o bootstrap**.
+6. Siga para a skill `bootstrap`. Nenhuma spec de feature começa antes de o marco 0 estar `Completed`.
 </execution_steps>
 
 <anti_patterns>

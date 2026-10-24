@@ -16,7 +16,8 @@ code_state() {
   data="$({
     git diff HEAD -- . ':(exclude).agent' 2>/dev/null || git diff -- . ':(exclude).agent'
     git ls-files --others --exclude-standard -- . ':(exclude).agent' | while IFS= read -r f; do
-      echo "$f $(git hash-object -- "$f")"
+      # symlink (ex.: .claude/skills -> ../.agent/skills): usa o alvo, não o conteúdo
+      if [[ -L "$f" ]]; then echo "$f -> $(readlink "$f")"; else echo "$f $(git hash-object -- "$f")"; fi
     done
   })"
   if [[ -n "$data" ]]; then printf '%s' "$data" | git hash-object --stdin; fi

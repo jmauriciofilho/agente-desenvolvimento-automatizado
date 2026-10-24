@@ -7,7 +7,7 @@ description: Cria a estrutura base (esqueletos, contratos, tipagens e wiring) de
 
 <execution_steps>
 1. Leia `.agent/project_instructions.md` (arquitetura e nomenclatura) e a spec (`<files_in_scope>`).
-2. Localize uma feature existente similar e use-a como modelo de estrutura e estilo.
+2. Localize uma feature existente similar e use-a como modelo de estrutura e estilo. Se não houver nenhuma (primeira feature de um projeto novo), siga `<architecture>` e o ADR de stack.
 3. Liste a árvore de arquivos a criar e confirme que coincide com `<files_in_scope>`.
 4. Crie esqueletos: assinaturas, interfaces/tipos, DTOs/schemas, stubs mínimos válidos que compilam (sem lógica densa).
 5. Faça o wiring: exports, rotas, registro de módulos, injeção de dependência, migrations vazias, se aplicável.

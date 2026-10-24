@@ -11,7 +11,7 @@
 # =============================================================================
 set -euo pipefail
 
-ADA_VERSION="2.2.0"
+ADA_VERSION="2.3.0"
 SELF="${BASH_SOURCE[0]}"
 SELF_DIR="$(cd "$(dirname "$SELF")" && pwd)"
 
@@ -218,6 +218,11 @@ if [[ -f "$SRC/known_hashes.txt" ]]; then
   done < <(grep -v '^#' "$SRC/known_hashes.txt" | sort -u -k2,2)
 fi
 
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  echo "⚠️  Esta pasta não é um repositório git: o controle de escopo (check-scope.sh) e os hooks só funcionam com git."
+  echo "   Rode 'git init' (num projeto novo, a skill bootstrap faz isso no marco 0)."
+fi
+
 if [[ "$DRY" != "1" ]]; then
   echo "$ADA_VERSION" > .agent/.ada-version
   { echo "# ADA v$ADA_VERSION — hash do template instalado (usado pelo --upgrade). Não edite."; printf '%s' "$MANIFEST_NEW" | sort -u -k2,2; } > "$MANIFEST"
@@ -238,7 +243,7 @@ if [[ "$EXISTED" == "1" ]]; then
   echo "  3. Valide: .agent/scripts/verify.sh"
 else
   echo "  1. Projeto existente: peça '/auto-context' ao agente."
-  echo "  2. Projeto novo: descreva a ideia; o agente fará o discovery."
+  echo "  2. Projeto novo: descreva a ideia; o agente fará o discovery e o bootstrap (marco 0)."
   echo "  3. Valide: .agent/scripts/verify.sh"
 fi
 echo "Reexecutar é seguro. Para atualizar o framework depois: --upgrade."
