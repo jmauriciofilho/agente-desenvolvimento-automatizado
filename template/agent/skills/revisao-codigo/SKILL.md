@@ -7,7 +7,7 @@ description: Autorrevisão rigorosa do diff contra a spec, corretude, segurança
 
 <execution_steps>
 1. Obtenha o diff (`git diff` / `git diff --staged` / branch vs. base) e a spec (se houver).
-2. **Escopo:** todo arquivo alterado está em `<files_in_scope>`? Há mudanças não relacionadas (ruído, formatação em massa)?
+2. **Escopo:** rode `.agent/scripts/check-scope.sh`; todo arquivo alterado está em `<files_in_scope>`? Há mudanças não relacionadas (ruído, formatação em massa)?
 3. **Spec:** cada requisito/AC está implementado e coberto por teste? Algo além do pedido foi adicionado?
 4. **Corretude:** lógica, bordas, nulos, concorrência, tratamento de erros, recursos não liberados, off-by-one.
 5. **Segurança:** entrada não validada, injeção, segredos, autorização, logs com dados sensíveis (aprofunde com `security-audit` se relevante).

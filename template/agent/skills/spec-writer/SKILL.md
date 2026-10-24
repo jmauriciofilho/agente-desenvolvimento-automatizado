@@ -10,10 +10,10 @@ description: Conduz o discovery e redige a especificação (spec) de uma feature
 1. Leia `.agent/project_instructions.md`, `.agent/memory/learnings.md` e explore o código relacionado (arquivos, testes, contratos existentes) ANTES de perguntar.
 2. Faça o discovery: no máximo 5–7 perguntas, agrupadas em uma única mensagem, cada uma com uma sugestão de resposta padrão. Cubra: objetivo/valor, comportamento esperado, casos de borda e erros, fora de escopo, restrições (performance, segurança, compatibilidade), como validar.
 3. Leia `.agent/templates/spec.template.md` e gere o rascunho em `.agent/specs/active/<slug>_spec.md` com `Status: Draft`.
-4. Garanta: requisitos numerados (R1..), critérios testáveis vinculados (AC1 (R1)..), `<files_in_scope>` reais (verificados no repositório), `<out_of_scope>`, `<risks>` e `<test_plan>` com rastreabilidade R → AC → teste.
+4. Garanta: requisitos numerados (R1..), critérios testáveis vinculados (AC1 (R1)..), `<files_in_scope>` reais (verificados no repositório; aceita diretório `pasta/` e glob `pasta/*`), arquivos de teste citados no `<test_plan>`, `<out_of_scope>`, `<risks>` e `<test_plan>` com rastreabilidade R → AC → teste.
 5. Aplique a skill `spec-review` no rascunho e corrija os achados.
 6. Apresente o resumo da spec e peça aprovação EXPLÍCITA. Não codifique antes disso.
-7. Após aprovação: `Status: Planned`, preencha `<execution_plan>` se vazio.
+7. Após aprovação: preencha `Aprovação` (data, nome do usuário ou `git config user.name`, trecho da mensagem), `Status: Planned`, preencha `<execution_plan>` se vazio. Ao iniciar a execução, o status passa a `In Progress`.
 </execution_steps>
 
 ## Modo B — Projeto novo (Arquiteto)
@@ -27,6 +27,7 @@ description: Conduz o discovery e redige a especificação (spec) de uma feature
 
 <anti_patterns>
 - NUNCA salvar spec como aprovada sem "ok" explícito do usuário.
+- NUNCA alterar requisitos, ACs ou escopo de uma spec aprovada sem registrar em `<change_log>` e obter nova aprovação.
 - NUNCA inventar arquivos em `<files_in_scope>`: confirme no repositório.
 - NUNCA escrever critérios vagos ("deve ser rápido", "funcionar bem").
 </anti_patterns>

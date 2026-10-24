@@ -9,7 +9,7 @@
 # =============================================================================
 set -euo pipefail
 
-ADA_VERSION="2.0.0"
+ADA_VERSION="2.1.0"
 SELF="${BASH_SOURCE[0]}"
 SELF_DIR="$(cd "$(dirname "$SELF")" && pwd)"
 
@@ -106,6 +106,7 @@ while IFS= read -r -d '' f; do
   case "$rel" in
     commands/*) continue ;;
     agent/*) dst=".$rel" ;;
+    claude/*) has_tool claude || continue; dst=".$rel" ;;
     *) dst="$rel" ;;
   esac
   install_file "$f" "$dst"
@@ -119,7 +120,7 @@ done
 install_file "$SRC/agent/templates/project_instructions.template.md" .agent/project_instructions.md
 install_file "$SRC/agent/templates/spec.template.md" .agent/specs/template_spec.md
 echo "$ADA_VERSION" > .agent/.ada-version
-chmod +x .agent/scripts/verify.sh 2>/dev/null || true
+find .agent/scripts -name '*.sh' -exec chmod +x {} + 2>/dev/null || true
 
 # 3. Adaptadores por ferramenta
 if [[ "$NO_LINKS" != "1" ]]; then
@@ -148,6 +149,10 @@ if [[ "$NO_COMMANDS" != "1" && -d "$SRC/commands" ]]; then
     fi
     if has_tool opencode; then install_file "$f" "$OPENCODE_COMMANDS_DIR/$n"; fi
   done
+fi
+
+if has_tool claude && [[ -f .claude/settings.json ]] && ! grep -q 'guard-edit.sh' .claude/settings.json; then
+  echo "⚠️  .claude/settings.json já existia: mescle os hooks e permissões de template/claude/settings.json do ADA para ativar a proteção de escopo."
 fi
 
 echo

@@ -19,6 +19,7 @@ agente-desenvolvimento-automatizado/
     ├── AGENTS.md
     ├── CLAUDE.md
     ├── agent/          # vira .agent/ no projeto (skills, templates, scripts, memory)
+    ├── claude/         # vira .claude/ (settings.json com hooks); só com --tools incluindo claude
     └── commands/       # slash-commands (Claude Code e OpenCode)
 ```
 
@@ -100,9 +101,13 @@ git add AGENTS.md CLAUDE.md .agent .claude .agents .opencode
 │   │   ├── active/                  # Specs em andamento
 │   │   ├── done/                    # Specs concluídas
 │   │   └── template_spec.md         # Cópia do template (compatibilidade com a v1)
-│   ├── scripts/verify.sh            # lint + typecheck + test + build, via <commands>
+│   ├── scripts/
+│   │   ├── verify.sh                # escopo + lint + typecheck + test + build, via <commands>
+│   │   ├── check-scope.sh           # diff dentro de <files_in_scope> da spec In Progress?
+│   │   ├── status.sh                # specs ativas, progresso e próximo passo
+│   │   └── hooks/                   # hooks do Claude Code (guard-edit, require-verify)
 │   └── skills/<16 skills>/SKILL.md
-├── .claude/{skills → link, commands/}
+├── .claude/{skills → link, commands/, settings.json}   # settings.json: hooks + permissões
 ├── .agents/skills → link            # Codex
 └── .opencode/{skills → link, command/}
 ```
@@ -135,9 +140,11 @@ Em dúvida, sobe um nível. Se o escopo crescer no meio da execução, o agente 
 | **VERIFICAR** | Procura a spec em `.agent/specs/active/`. Sem spec (e tarefa que exige): para de codar e roda `spec-writer` |
 | **ANALISAR** | Lê `<requirements>`, `<acceptance_criteria>`, `<files_in_scope>`, `<out_of_scope>` |
 | **PLANEJAR** | Gera `<execution_plan>` se estiver vazio |
-| **EXECUTAR** | Código completo, só em `<files_in_scope>`; marca `[x]` a cada passo |
+| **EXECUTAR** | Spec vira `In Progress`; testes primeiro (falhando), depois a lógica; código completo, só em `<files_in_scope>`; marca `[x]` a cada passo |
 | **VALIDAR** | `verify.sh` + `revisao-codigo` do diff + conferência dos ACs |
 | **FECHAR** | Skill `memoria`; spec vira `Completed` e vai para `done/` |
+
+**Retomada:** cada passo concluído (ou interrompido) é registrado em `<progress_log>`. Numa conversa nova, o agente roda `status.sh`, vê a spec `In Progress` e oferece retomá-la a partir do próximo passo. Só uma spec fica `In Progress` por vez.
 
 ### Spec v2
 Além dos blocos da v1, a spec agora tem `<files_in_scope>`, `<out_of_scope>`, `<risks>`, `<test_plan>` (rastreabilidade **R → AC → teste**) e `<definition_of_done>`.
@@ -179,6 +186,7 @@ Atalhos opcionais gerados para **Claude Code** e **OpenCode**. Nas demais ferram
 | `/review [foco]` | `revisao-codigo` do diff atual |
 | `/verify [etapas]` | Roda `verify.sh` e trata falhas |
 | `/context-sync` | Sincroniza o contexto com o código real |
+| `/retomar` | Mostra as specs ativas (`status.sh`) e retoma a que está `In Progress` |
 
 ---
 
@@ -201,6 +209,8 @@ Lê o bloco `<commands>` de `.agent/project_instructions.md`:
 .agent/scripts/verify.sh lint test    # apenas as etapas indicadas
 ```
 
+Sem argumentos, o `verify.sh` também roda o `check-scope.sh` (etapa `scope`) e, se tudo passar, grava um carimbo em `.git/ada-verify-stamp` com o hash do código atual. É esse carimbo que o hook `Stop` do Claude Code confere.
+
 | Código de saída | Significado |
 |---|---|
 | `0` | Tudo que foi executado passou |
@@ -209,6 +219,20 @@ Lê o bloco `<commands>` de `.agent/project_instructions.md`:
 | `3` | Nada executado (nenhum comando configurado) |
 
 Etapas com valor `N/A` ou placeholder `[...]` são ignoradas, não falham.
+
+### check-scope.sh
+
+Compara o diff (`git diff HEAD` + arquivos novos) com os caminhos de `<files_in_scope>` e `<test_plan>` das specs com `Status: In Progress` (na mini-spec, a linha `**Arquivos:**`). Aceita diretório (`src/lib/`) e glob (`src/*.ts`). Arquivos em `.agent/` sempre podem ser alterados. Sem spec em andamento, não bloqueia nada.
+
+### Hooks do Claude Code (`.claude/settings.json`)
+
+| Hook | Quando | O que faz |
+|---|---|---|
+| `PreToolUse` → `guard-edit.sh` | Antes de `Edit`/`Write` | Bloqueia arquivo fora do escopo da spec em andamento e diz ao agente como pedir autorização |
+| `SessionStart` → `status.sh --brief` | Ao abrir/retomar a sessão | Coloca no contexto as specs ativas e o próximo passo, para o agente oferecer a retomada |
+| `Stop` → `require-verify.sh` | Ao encerrar o turno | Bloqueia se houver mudança fora do escopo ou código alterado sem `verify.sh` completo verde (uma vez por turno, sem loop) |
+
+Também traz permissões: `verify.sh` e `check-scope.sh` liberados, edição de `.env*`/`.gitignore` pede confirmação, edição em `node_modules`/`vendor`/`venv` é negada. Se o projeto já tinha `.claude/settings.json`, o instalador mantém o seu e avisa para mesclar.
 
 ---
 

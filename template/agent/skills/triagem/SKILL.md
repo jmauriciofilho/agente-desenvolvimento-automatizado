@@ -15,7 +15,7 @@ description: Classifica a tarefa (trivial, pequena, feature ou bug) e escolhe o 
 3. Declare em uma linha: `Triagem: <classe> — <motivo>`.
 4. Siga o fluxo:
    - trivial → executar, rodar `.agent/scripts/verify.sh`, entregar.
-   - pequena → preencher `.agent/templates/mini_spec.template.md` (salvar em `.agent/specs/active/`), pedir "ok" rápido, executar.
+   - pequena → preencher `.agent/templates/mini_spec.template.md` (salvar em `.agent/specs/active/<slug>_mini.md`, `Status: Draft`), pedir "ok" rápido (preencher `Aprovação`, `Planned`), executar (`In Progress`). Mesmo ciclo de status e fechamento da spec completa.
    - feature → skill `spec-writer` → `spec-review` → aprovação explícita → ciclo SDD completo.
    - bug → skill `bugfix`.
 5. Durante a execução, se o escopo crescer, PARE, reclassifique e informe.

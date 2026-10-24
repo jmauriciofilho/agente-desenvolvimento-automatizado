@@ -7,7 +7,7 @@ description: Revisa uma spec antes da aprovação, checando contradições, crit
 
 <execution_steps>
 Verifique cada item e liste os achados como `[BLOQUEANTE]`, `[ATENÇÃO]` ou `[SUGESTÃO]`:
-1. **Completude:** todos os blocos do template estão presentes e sem placeholders `[...]`.
+1. **Completude:** todos os blocos do template estão presentes e sem placeholders `[...]` (exceto `Aprovação: pendente` e `<change_log>` vazio, preenchidos após o ok).
 2. **Testabilidade:** cada AC é verificável objetivamente (entrada → saída/efeito mensurável).
 3. **Rastreabilidade:** todo R tem ≥ 1 AC; todo AC tem ≥ 1 teste no `<test_plan>`; nenhum AC órfão.
 4. **Escopo:** `<files_in_scope>` existem (ou serão criados de forma coerente com a arquitetura); `<out_of_scope>` está explícito.
