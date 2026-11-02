@@ -11,7 +11,7 @@
 # =============================================================================
 set -euo pipefail
 
-ADA_VERSION="2.4.0"
+ADA_VERSION="2.4.1"
 SELF="${BASH_SOURCE[0]}"
 SELF_DIR="$(cd "$(dirname "$SELF")" && pwd)"
 
@@ -21,6 +21,13 @@ CODEX_SKILLS_DIR=".agents/skills"
 OPENCODE_SKILLS_DIR=".opencode/skills"
 CLAUDE_COMMANDS_DIR=".claude/commands"
 OPENCODE_COMMANDS_DIR=".opencode/command"
+
+# Windows (Git Bash/MSYS/Cygwin): por padrão `ln -s` copia em silêncio. Com nativestrict ele cria symlink
+# de verdade (Modo de Desenvolvedor ou admin) ou falha, e aí caímos na cópia marcada com .ada-copy.
+case "$(uname -s 2>/dev/null)" in
+  MINGW*|MSYS*) export MSYS="${MSYS:+$MSYS }winsymlinks:nativestrict" ;;
+  CYGWIN*) export CYGWIN="${CYGWIN:+$CYGWIN }winsymlinks:nativestrict" ;;
+esac
 
 FORCE=0; UPGRADE=0; DRY=0; NO_LINKS=0; NO_COMMANDS=0; SRC=""
 TOOLS="antigravity,claude,codex,opencode"
@@ -134,18 +141,38 @@ install_file() {
   fi
 }
 
+# Pasta de skills sem .ada-copy que é cópia do ADA? (versões antigas no Git Bash copiavam sem marcar)
+# Só é se todo arquivo dela for igual ao atual ou a uma versão publicada do template.
+is_unmarked_ada_copy() {
+  local link="$1" f rel h n=0
+  [[ -d "$link" && ! -f "$link/.ada-copy" ]] || return 1
+  while IFS= read -r -d '' f; do
+    rel="${f#"$link"/}"; n=$((n + 1))
+    if cmp -s "$f" ".agent/skills/$rel"; then continue; fi
+    h="$(sha < "$f")"
+    [[ -f "$SRC/known_hashes.txt" ]] && grep -qxF "$h agent/skills/$rel" "$SRC/known_hashes.txt" || return 1
+  done < <(find "$link" -type f -print0)
+  [[ "$n" -gt 0 ]]
+}
+
+copy_skills() {
+  rm -rf "$1"; mkdir -p "$(dirname "$1")"; cp -R .agent/skills "$1"; : > "$1/.ada-copy"
+}
+
 link_skills() {
   local link="$1" target="../.agent/skills"
   if [[ -L "$link" ]]; then return 0; fi
   if [[ "$DRY" == "1" ]]; then echo "🔗 (dry-run) link/cópia: $link"; return 0; fi
+  if is_unmarked_ada_copy "$link"; then : > "$link/.ada-copy"; echo "🏷️  cópia antiga do ADA reconhecida: $link"; fi
   if [[ -d "$link" && -f "$link/.ada-copy" ]]; then
-    rm -rf "$link"; cp -R .agent/skills "$link"; : > "$link/.ada-copy"
+    copy_skills "$link"
     echo "♻️  cópia atualizada: $link"; return 0
   fi
   if [[ -e "$link" ]]; then echo "⚠️  $link existe e não é do ADA; mantido (mescle manualmente)."; return 0; fi
   mkdir -p "$(dirname "$link")"
-  if ln -s "$target" "$link" 2>/dev/null; then echo "🔗 link: $link -> $target"
-  else cp -R .agent/skills "$link"; : > "$link/.ada-copy"; echo "📋 cópia (sem symlink): $link"; fi
+  # Confere com -L: no Windows o `ln -s` pode "dar certo" criando uma cópia comum
+  if ln -s "$target" "$link" 2>/dev/null && [[ -L "$link" ]]; then echo "🔗 link: $link -> $target"
+  else copy_skills "$link"; echo "📋 cópia (sem symlink; rode o instalador de novo após editar skills): $link"; fi
 }
 
 PREV="$(cat .agent/.ada-version 2>/dev/null || true)"
@@ -162,6 +189,7 @@ while IFS= read -r -d '' f; do
     commands/*|known_hashes.txt*) continue ;;
     agent/*) dst=".$rel" ;;
     claude/*) has_tool claude || continue; dst=".$rel" ;;
+    CLAUDE.md) has_tool claude || continue; dst="$rel" ;;
     *) dst="$rel" ;;
   esac
   install_file "$f" "$dst"

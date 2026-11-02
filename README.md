@@ -86,7 +86,7 @@ git add AGENTS.md CLAUDE.md .agent .claude .agents .opencode
 
 **Ferramenta sem suporte nativo a skills?** Funciona igual. O `AGENTS.md` traz um índice de skills com o gatilho de cada uma e instrui o agente a ler `.agent/skills/<nome>/SKILL.md` quando o gatilho ocorrer.
 
-**Windows sem permissão de symlink?** O script cai automaticamente para cópia dos arquivos (marcada com `.ada-copy`). Rode o script novamente após editar skills para atualizar as cópias.
+**Windows?** Rode o instalador no **WSL** (recomendado) ou no **Git Bash**; os scripts são bash e precisam de `git`. No Git Bash, o instalador pede symlinks nativos (`winsymlinks:nativestrict`): com o Modo de Desenvolvedor do Windows ligado, as pastas de skills viram links de verdade; sem ele, o script cai para cópia dos arquivos (marcada com `.ada-copy`). Rode o script novamente após editar skills para atualizar as cópias. Cópias sem marca deixadas por versões anteriores são reconhecidas e passam a ser atualizadas.
 
 ---
 
@@ -264,7 +264,7 @@ Também traz permissões: `verify.sh` e `check-scope.sh` liberados, edição de 
 | `--upgrade` | Atualiza arquivos do framework que você **não** customizou; nos customizados, grava a nova versão em `arquivo.ada-new` |
 | `--force` | Sobrescreve arquivos do framework, com backup `arquivo.bak.<data>` |
 | `--dry-run` | Mostra o que seria feito, sem alterar nada |
-| `--tools=a,b` | Limita a `antigravity,claude,codex,opencode` (padrão: todas) |
+| `--tools=a,b` | Limita a `antigravity,claude,codex,opencode` (padrão: todas). Ex.: `--tools=opencode` instala `.agent/`, `AGENTS.md` e `.opencode/`; `CLAUDE.md` e `.claude/` só entram com `claude` |
 | `--no-links` | Não cria symlinks/cópias de skills |
 | `--no-commands` | Não cria slash-commands |
 | `-h`, `--help` | Ajuda |
